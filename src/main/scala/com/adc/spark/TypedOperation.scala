@@ -7,6 +7,7 @@ import org.apache.spark.sql.SparkSession
   */
 object TypedOperation {
   case class Employee(name: String, age: Long, depId: Long, gender: String, salary: Long)
+  case class Department(id: Long, name: String)
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
       .builder()
@@ -19,8 +20,10 @@ object TypedOperation {
 
     val employee = spark.read.json("C:\\Users\\Administrator\\Desktop\\employee.json")
     val employee2 = spark.read.json("C:\\Users\\Administrator\\Desktop\\employee2.json")
+    val department = spark.read.json("C:\\Users\\Administrator\\Desktop\\department.json")
     val employeeDS = employee.as[Employee]
     val employeeDS2 = employee2.as[Employee]
+    val departmentDS = department.as[Department]
 
    /* println(employeeDS.rdd.partitions.size)
 
@@ -44,18 +47,45 @@ object TypedOperation {
     // distinct，是根据每一条数据，进行完整内容的比对和去重
     // dropDuplicates，可以根据指定的字段进行去重
 
-    val distinctEmployeeDS = employeeDS.distinct();
+    /*val distinctEmployeeDS = employeeDS.distinct();
     distinctEmployeeDS.show()
     val dropDuplicatesEmployeeDS = employeeDS.dropDuplicates(Seq("name"))
-    dropDuplicatesEmployeeDS.show()
+    dropDuplicatesEmployeeDS.show()*/
 
     // except：获取在当前dataset中有，但是在另外一个dataset中没有的元素
     // filter：根据我们自己的逻辑，如果返回true，那么就保留该元素，否则就过滤掉该元素
     // intersect：获取两个数据集的交集
 
-       employeeDS.except(employeeDS2).show()
+       /*employeeDS.except(employeeDS2).show()
        employeeDS.filter { employee => employee.age > 30 }.show()
-       employeeDS.intersect(employeeDS2).show()
+       employeeDS.intersect(employeeDS2).show()*/
+
+    // map：将数据集中的每条数据都做一个映射，返回一条新数据
+    // flatMap：数据集中的每条数据都可以返回多条数据
+    // mapPartitions：一次性对一个partition中的数据进行处理
+
+    /*employeeDS.map { employee => (employee.name, employee.salary + 1000) }.show()
+    departmentDS.flatMap {
+      department => Seq(Department(department.id + 1, department.name + "_1"), Department(department.id + 2, department.name + "_2"))
+    }.show()
+    employeeDS.mapPartitions { employees => {
+      val result = scala.collection.mutable.ArrayBuffer[(String, Long)]()
+      while(employees.hasNext) {
+        var emp = employees.next()
+        result += ((emp.name, emp.salary + 1000))
+      }
+      result.iterator
+    }
+    }.show()*/
+
+    //employeeDS.joinWith(departmentDS, $"depId" === $"id").show()
+
+   // employeeDS.sort($"salary".desc).show()
+
+    val employeeDSArr = employeeDS.randomSplit(Array(1, 2, 3))
+    employeeDSArr.foreach { ds => ds.show() }
+
+    employeeDS.sample(false, 0.3).show()
 
   }
 
