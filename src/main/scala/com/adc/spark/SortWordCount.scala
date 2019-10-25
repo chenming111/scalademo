@@ -20,6 +20,7 @@ object SortWordCount {
     val countWord = wordCounts.map{word => (word._2,word._1)}
     val sortedCountWord = countWord.sortByKey(false)
     val sortedWordCount = sortedCountWord.map{word => (word._2,word._1)}
+    sortedWordCount.saveAsTextFile("C:\\Users\\Administrator\\Desktop\\wc.txt")
      sortedWordCount.foreach(s => {
        println("word \""+s._1+ "\" appears "+s._2+" times.")
      })
