@@ -14,7 +14,7 @@
   <url>http://www.example.com</url>
 
   <properties>
-    <hadoop.version>2.6.0</hadoop.version>
+    <hadoop.version>2.7.0</hadoop.version>
     <scala.binary.version>2.11</scala.binary.version>
     <spark.version>2.2.0</spark.version>
   </properties>
